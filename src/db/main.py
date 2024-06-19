@@ -142,3 +142,7 @@ def deleteOne(name):
 def deleteAll():
     db.cats.delete_many({})
     return f"All cat docs were deleted"
+
+
+if __name__ == "__main__":
+    pass
