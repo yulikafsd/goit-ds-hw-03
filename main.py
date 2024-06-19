@@ -44,10 +44,54 @@ def readOne(name):
 # Оновлення (Update)
 
 
+def update(*args):
+
+    # if no required params, raise Error
+    if len(args) < 3:
+        print(
+            f"Error! 3 parameters should be provided: <command: age or feature> <name> <new_value>"
+        )
+
+    # if 2 params, find cat by name
+    elif len(args) > 2:
+        command, name, new_value = args
+
+        if command == "age":
+            print(update_age(name, new_value))
+
+        elif command == "feature":
+            print(update_feature(name, new_value))
+
+        else:
+            print(f"There is no such command {command}, please choose: age or feature")
+
+
 # Створіть функцію, яка дозволяє користувачеві оновити вік кота за ім'ям.
+def update_age(name, new_value):
+
+    # find cat in collection
+    result = db.cats.find_one({"name": name})
+
+    # if found, update cat doc, otherwise return "not found" message
+    if result != None:
+        db.cats.update_one({"name": name}, {"$set": {"age": new_value}})
+        return db.cats.find_one({"name": name})
+    else:
+        return f"There is no cat named {name} in cats database"
+
+
 # Створіть функцію, яка дозволяє додати нову характеристику до списку features кота за ім'ям.
-def update():
-    pass
+def update_feature(name, new_value):
+
+    # find cat in collection
+    result = db.cats.find_one({"name": name})
+
+    # if found, update cat doc, otherwise return "not found" message
+    if result != None:
+        db.cats.update_one({"name": name}, {"$push": {"features": new_value}})
+        return db.cats.find_one({"name": name})
+    else:
+        return f"There is no cat named {name} in cats database"
 
 
 # Видалення (Delete)
@@ -60,4 +104,4 @@ def delete():
 
 
 if __name__ == "__main__":
-    read("Giuseppina")
+    update("feature", "Stacy", "халоска")
