@@ -6,24 +6,24 @@ def read(*args):
 
     # if no params, read all the collection
     if len(args) == 0:
-        print(read_all())
+        print(readAll())
 
     # if 1 param, find cat by name
     elif len(args) == 1:
         name = args[0]
-        print(read_one(name))
+        print(readOne(name))
 
-    # if more params, raise Error
+    # if more params, return Error message
     else:
         print(
-            f"Error! Only 1 parameter (cat's name) should be provided, instead {len(args)} were given"
+            f"Error! Only 1 parameter (cat's name) can be provided, instead {len(args)} were given"
         )
 
 
 # Реалізуйте функцію для виведення всіх записів із колекції.
-def read_all():
+def readAll():
 
-    # read collection
+    # read the collection
     cat_docs = db.cats.find({})
 
     # return list of cat docs
@@ -31,20 +31,20 @@ def read_all():
 
 
 # Реалізуйте функцію, яка дозволяє користувачеві ввести ім'я кота та виводить інформацію про цього кота.
-def read_one(name):
+def readOne(name):
 
-    # find cat in collection
+    # find cat in the collection
     result = db.cats.find_one({"name": name})
 
     # if found, return cat doc, otherwise return "not found" message
     return (
-        result if result != None else f"There is no cat named {name} in cats database"
+        result
+        if result != None
+        else f"Error! There is no cat named {name} in cats collection"
     )
 
 
 # Оновлення (Update)
-
-
 def update(*args):
 
     # if 3 params, find cat by name
@@ -52,15 +52,17 @@ def update(*args):
         command, name, new_value = args
 
         if command == "age":
-            print(update_age(name, new_value))
+            print(updateAge(name, new_value))
 
         elif command == "feature":
-            print(update_feature(name, new_value))
+            print(updateFeature(name, new_value))
 
         else:
-            print(f"There is no such command {command}, please choose: age or feature")
+            print(
+                f"Error! There is no such command {command}, please choose: age or feature"
+            )
 
-    # if no required params or more, raise Error
+    # if no required params or more, return Error message
     if len(args) != 3:
         print(
             f"Error! 3 parameters should be provided: <command: age or feature> <name> <new_value>"
@@ -68,7 +70,7 @@ def update(*args):
 
 
 # Створіть функцію, яка дозволяє користувачеві оновити вік кота за ім'ям.
-def update_age(name, new_value):
+def updateAge(name, new_value):
 
     # find cat in collection
     result = db.cats.find_one({"name": name})
@@ -78,11 +80,11 @@ def update_age(name, new_value):
         db.cats.update_one({"name": name}, {"$set": {"age": new_value}})
         return db.cats.find_one({"name": name})
     else:
-        return f"There is no cat named {name} in cats database"
+        return f"Error! There is no cat named {name} in cats collection"
 
 
 # Створіть функцію, яка дозволяє додати нову характеристику до списку features кота за ім'ям.
-def update_feature(name, new_value):
+def updateFeature(name, new_value):
 
     # find cat in collection
     result = db.cats.find_one({"name": name})
@@ -92,15 +94,51 @@ def update_feature(name, new_value):
         db.cats.update_one({"name": name}, {"$push": {"features": new_value}})
         return db.cats.find_one({"name": name})
     else:
-        return f"There is no cat named {name} in cats database"
+        return f"Error! There is no cat named {name} in cats collection"
 
 
 # Видалення (Delete)
+def delete(*args):
+
+    # if no params, delete all docs in the collection
+    if len(args) == 0:
+        print(deleteAll())
+
+    # if 1 param, delete cat by name
+    elif len(args) == 1:
+        name = args[0]
+        print(deleteOne(name))
+
+    # if more params, return Error message
+    else:
+        print(
+            f"Error! Only 1 parameter (cat's name) can be provided, instead {len(args)} were given"
+        )
 
 
 # Реалізуйте функцію для видалення запису з колекції за ім'ям тварини.
+def deleteOne(name):
+
+    # find cat in collection
+    cat = db.cats.find_one({"name": name})
+
+    # if there is no cat with this name in the collection, return Error message
+    if cat == None:
+        return f"Error! There is no cat {name} in cats collection"
+
+    # if found, delete cat doc and return "deleted" message
+    else:
+        db.cats.delete_one({"name": name})
+        result = db.cats.find_one({"name": name})
+        return (
+            f"Cat doc of {name} was deleted"
+            # if after delete cat is still in, return "still-in" message
+            if result == None
+            else f"Error! Somethimg went wrong. Cat doc {name} is still in the collection. Try again"
+        )
+
+
 # Реалізуйте функцію для видалення всіх записів із колекції.
-
-
-if __name__ == "__main__":
-    update("age", "Stacy", 10)
+def deleteAll():
+    db.cats.delete_many({})
+    return f"All cat docs were deleted"
