@@ -6,11 +6,12 @@ def read(*args):
 
     # if no params, read all the collection
     if len(args) == 0:
-        print(readAll())
+        print(read_all())
 
     # if 1 param, find cat by name
     elif len(args) == 1:
-        print(readOne(args[0]))
+        name = args[0]
+        print(read_one(name))
 
     # if more params, raise Error
     else:
@@ -20,7 +21,7 @@ def read(*args):
 
 
 # Реалізуйте функцію для виведення всіх записів із колекції.
-def readAll():
+def read_all():
 
     # read collection
     cat_docs = db.cats.find({})
@@ -30,7 +31,7 @@ def readAll():
 
 
 # Реалізуйте функцію, яка дозволяє користувачеві ввести ім'я кота та виводить інформацію про цього кота.
-def readOne(name):
+def read_one(name):
 
     # find cat in collection
     result = db.cats.find_one({"name": name})
@@ -46,14 +47,8 @@ def readOne(name):
 
 def update(*args):
 
-    # if no required params, raise Error
-    if len(args) < 3:
-        print(
-            f"Error! 3 parameters should be provided: <command: age or feature> <name> <new_value>"
-        )
-
-    # if 2 params, find cat by name
-    elif len(args) > 2:
+    # if 3 params, find cat by name
+    if len(args) == 3:
         command, name, new_value = args
 
         if command == "age":
@@ -64,6 +59,12 @@ def update(*args):
 
         else:
             print(f"There is no such command {command}, please choose: age or feature")
+
+    # if no required params or more, raise Error
+    if len(args) != 3:
+        print(
+            f"Error! 3 parameters should be provided: <command: age or feature> <name> <new_value>"
+        )
 
 
 # Створіть функцію, яка дозволяє користувачеві оновити вік кота за ім'ям.
@@ -99,9 +100,7 @@ def update_feature(name, new_value):
 
 # Реалізуйте функцію для видалення запису з колекції за ім'ям тварини.
 # Реалізуйте функцію для видалення всіх записів із колекції.
-def delete():
-    pass
 
 
 if __name__ == "__main__":
-    update("feature", "Stacy", "халоска")
+    update("age", "Stacy", 10)
