@@ -6,4 +6,4 @@ client = MongoClient(
     server_api=ServerApi("1"),
 )
 
-db = client.book
+db = client.test

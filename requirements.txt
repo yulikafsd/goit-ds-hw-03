@@ -1,5 +1,15 @@
+beautifulsoup4==4.12.3
+certifi==2024.6.2
+charset-normalizer==3.3.2
 dnspython==2.6.1
 Faker==25.8.0
+greenlet==3.0.3
+idna==3.7
+lxml==5.2.2
 pymongo==4.7.3
 python-dateutil==2.9.0.post0
+requests==2.32.3
 six==1.16.0
+soupsieve==2.5
+typing_extensions==4.12.2
+urllib3==2.2.2
