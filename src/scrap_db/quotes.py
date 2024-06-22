@@ -1,3 +1,4 @@
+import json
 import requests
 from bs4 import BeautifulSoup
 
@@ -13,9 +14,11 @@ def parse_quotes(soup):
 
     # Loop quotes, getting text from them
     for quote_element in quote_elements:
-        quote_text = quote_element.find("span", class_="text").text
-        author_text = quote_element.find("small", class_="author").text
-        tags_text_list = [tag.text for tag in quote_element.find_all("a", class_="tag")]
+        quote_text = quote_element.find("span", class_="text").text.strip()
+        author_text = quote_element.find("small", class_="author").text.strip()
+        tags_text_list = [
+            tag.text.strip() for tag in quote_element.find_all("a", class_="tag")
+        ]
         quotes.append(
             {"quote": quote_text, "author": author_text, "tags": tags_text_list}
         )
@@ -23,9 +26,17 @@ def parse_quotes(soup):
     return quotes
 
 
-def save_quotes_to_db(quotes):
-    for quote in quotes:
-        db.quotes.update_one({"quote": quote["quote"]}, {"$set": quote}, upsert=True)
+def save_quotes_to_json(new_quotes):
+    try:
+        with open("./src/scrap_db/quotes.json", "r", encoding="utf-8") as f:
+            existing_quotes = json.load(f)
+    except FileNotFoundError:
+        existing_quotes = []
+
+    existing_quotes.extend(new_quotes)
+
+    with open("./src/scrap_db/quotes.json", "w", encoding="utf-8") as f:
+        json.dump(existing_quotes, f, indent=4)
 
 
 def get_next_page_url(soup):
@@ -44,7 +55,7 @@ def scrape_quotes(start_url):
         html_doc = requests.get(current_url)
         soup = BeautifulSoup(html_doc.text, "lxml")
         quotes = parse_quotes(soup)
-        save_quotes_to_db(quotes)
+        save_quotes_to_json(quotes)
         print(f"Scraped: {current_url}")
         current_url = get_next_page_url(soup)
 
@@ -52,3 +63,10 @@ def scrape_quotes(start_url):
 if __name__ == "__main__":
     start_url = "https://quotes.toscrape.com/"
     scrape_quotes(start_url)
+
+    with open("./src/scrap_db/quotes.json", "r", encoding="utf-8") as f:
+        quotes_data = json.load(f)
+        for quote in quotes_data:
+            db.quotes.update_one(
+                {"quote": quote["quote"]}, {"$set": quote}, upsert=True
+            )
