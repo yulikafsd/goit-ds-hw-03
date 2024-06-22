@@ -41,13 +41,13 @@ cats_list = []
 
 
 # Generate features for a cat
-def generate_features():
+def generate_features() -> list:
     features_list = sample(cat_features, randint(1, 5))
     return features_list
 
 
 # Create cat docs <num> times
-def create_cats(num):
+def create_cats(num: int) -> list:
     for _ in range(num):
         cats_list.append(
             {
@@ -60,7 +60,7 @@ def create_cats(num):
 
 
 # Insert cat docs into the collection and show the new docs
-def insert_cats(num):
+def insert_cats(num: int):
     db.cats.insert_many(create_cats(num))
     cat_docs = list(db.cats.find().sort([("_id", -1)]).limit(num))
     for cat_doc in cat_docs:
